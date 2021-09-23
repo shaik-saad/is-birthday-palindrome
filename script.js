@@ -116,15 +116,12 @@ function getNextDate(date){
 function getNextPalindromeDate(date){
 
     var nextDate = getNextDate(date)
-    console.log(nextDate)
     var counter = 0
 
     while(1){
         counter++
         var dateStr = dateAsString(nextDate)
-        console.log(dateStr)
         var resultList = checkPalindromeForAllDateFormats(dateStr)
-        console.log(resultList)
 
         if(resultList){
             return [counter, nextDate]
@@ -134,11 +131,38 @@ function getNextPalindromeDate(date){
     }
 }
 
-var date = {
-    day: 5,
-    month: 1,
-    year: 2020
+
+const birthDayInput = document.querySelector("#birth-day-input")
+const checkBtn = document.querySelector("#check-btn")
+const output = document.querySelector("#output")
+
+function checkClickHandler(){
+    var birthday = birthDayInput.value
+    if(birthday === ""){
+       return console.log("hehe")
+    }
+
+    var date = birthday.split("-")
+    var yyyy = date[0]
+    var mm = date[1]
+    var dd = date[2]
+
+    var date = {
+        day: Number(dd),
+        month: Number(mm),
+        year: Number(yyyy)
+    }
+
+    var dateStr = dateAsString(date)
+    var result = checkPalindromeForAllDateFormats(dateStr)
+
+    if(!result){
+        const [counter, nextDate] = getNextPalindromeDate(date)
+
+        output.innerText = `The next palindrome date is ${nextDate.day}-${nextDate.month}-${nextDate.year}, you missed by ${counter} days`
+    } else{
+        output.innerText = "Yay! Your birthday is palindrome"
+    }
+
 }
-
-
-console.log(getNextPalindromeDate(date))
+checkBtn.addEventListener("click", checkClickHandler)
