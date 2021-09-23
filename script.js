@@ -135,11 +135,12 @@ function getNextPalindromeDate(date){
 const birthDayInput = document.querySelector("#birth-day-input")
 const checkBtn = document.querySelector("#check-btn")
 const output = document.querySelector("#output")
+const errorMessage = document.querySelector("#error-message")
 
 function checkClickHandler(){
     var birthday = birthDayInput.value
     if(birthday === ""){
-       return console.log("hehe")
+       return errorMessage.innerText = "Please select your birth date."
     }
 
     var date = birthday.split("-")
@@ -158,9 +159,10 @@ function checkClickHandler(){
 
     if(!result){
         const [counter, nextDate] = getNextPalindromeDate(date)
-
+        errorMessage.innerText = ""
         output.innerText = `The next palindrome date is ${nextDate.day}-${nextDate.month}-${nextDate.year}, you missed by ${counter} days`
     } else{
+        errorMessage.innerText = ""
         output.innerText = "Yay! Your birthday is palindrome"
     }
 
