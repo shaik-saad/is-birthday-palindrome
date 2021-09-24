@@ -42,21 +42,50 @@ function getAllDateFormats(date){
     var mmddyy = date.month + date.day + date.year.slice(-2)
     var yymmdd = date.year.slice(-2) + date.month + date.day
 
-    return [ddmmyyyy, mmddyyyy, yyyymmdd, ddmmyy, mmddyy, yymmdd]
+    var formatsAndDatesArray = [{
+        format: "ddmmyyyy",
+        formattedDate: ddmmyyyy
+    },
+    {
+        format: "mmddyyyy",
+        formattedDate: mmddyyyy
+    },
+    {
+        format: "yyyymmdd",
+        formattedDate: yyyymmdd
+    },{
+        format: "ddmmyy",
+        formattedDate: ddmmyy
+    },
+    {
+        format: "mmddyy",
+        formattedDate: mmddyy
+    },
+    {
+        format: "yymmdd",
+        formattedDate: yymmdd
+    }]
+
+    return formatsAndDatesArray
 }
 
 function checkPalindromeForAllDateFormats(date){
     var dateAllFormatsArray = getAllDateFormats(date)
 
     var foundPalindrome = false
+    var dateFormat
     for(var i = 0; i < dateAllFormatsArray.length; i++){
-        if(isPalindrome(dateAllFormatsArray[i])){
+        if(isPalindrome(dateAllFormatsArray[i].formattedDate)){
             foundPalindrome = true
+            dateFormat = dateAllFormatsArray[i].format
             break
         }
     }
 
-    return foundPalindrome
+    return {
+        foundPalindrome: foundPalindrome,
+        dateFormat: dateFormat
+    }
 }
 
 function isLeapYear(year){
@@ -78,7 +107,7 @@ function getNextDate(date){
     var month = date.month
     var year = date.year
 
-    var daysInMonth = [31, 28, 31, 30, 31, 30, 31, 30, 31, 30, 31, 30]
+    var daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
     if(month === 2){
         if(isLeapYear(year)){
@@ -123,14 +152,72 @@ function getNextPalindromeDate(date){
         var dateStr = dateAsString(nextDate)
         var resultList = checkPalindromeForAllDateFormats(dateStr)
 
-        if(resultList){
-            return [counter, nextDate]
+
+        if(resultList.foundPalindrome){
+            console.log(resultList.dateFormat)
+            return [counter, nextDate, resultList.dateFormat]
         }
 
         nextDate = getNextDate(nextDate)
     }
 }
 
+function getPreviousDate(date){
+    var day = date.day - 1
+    var month = date.month 
+    var year = date.year
+
+    var daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+    if( day === 0){
+        month = month - 1
+        if( month === 0){
+            year = year - 1
+            month = 12
+            day = daysInMonth[month - 1]
+        } else if(month === 2){
+            if(isLeapYear(year)){
+                day = 29
+            }else{
+                day = 28
+            }
+        } else{
+            day = daysInMonth[month - 1]
+        }
+    }
+    
+    return {
+        day: day,
+        month: month,
+        year: year
+    }
+
+}
+
+function getPreviousPalindromeDate(date){
+
+    var previousDate = getPreviousDate(date)
+    var counter = 0
+
+    while(1){
+        counter++
+        var dateStr = dateAsString(previousDate)
+        var resultList = checkPalindromeForAllDateFormats(dateStr)
+
+        if(resultList.foundPalindrome){
+            return [counter, previousDate, resultList.dateFormat]
+        }
+        previousDate = getPreviousDate(previousDate)
+    }
+}
+
+// var date = {
+//     day: 2,
+//     month: 10,
+//     year: 2001
+// }
+
+// console.log(getPreviousPalindromeDate(date))
 
 const birthDayInput = document.querySelector("#birth-day-input")
 const checkBtn = document.querySelector("#check-btn")
@@ -155,15 +242,21 @@ function checkClickHandler(){
     }
 
     var dateStr = dateAsString(date)
-    var result = checkPalindromeForAllDateFormats(dateStr)
+    var resultList = checkPalindromeForAllDateFormats(dateStr)
 
-    if(!result){
-        const [counter, nextDate] = getNextPalindromeDate(date)
+    if(!resultList.foundPalindrome){
+        const [nextCounter, nextDate, formatOfNextDate] = getNextPalindromeDate(date)
+        const [previousCounter, previousDate, formatOfPreviousDate] = getPreviousPalindromeDate(date)
         errorMessage.innerText = ""
-        output.innerText = `Oops! Your Birthday is not a palindrome. The next palindrome date is ${nextDate.day}-${nextDate.month}-${nextDate.year}, you missed by ${counter} days 😏`
+        if(nextCounter > previousCounter){
+            output.innerText = `Oops! Your Birthday is not a palindrome. The nearest palindrome date is ${previousDate.day}-${previousDate.month}-${previousDate.year} in this ${formatOfPreviousDate} format, you missed by ${previousCounter} days 😏`
+        } else{
+            output.innerText = `Oops! Your Birthday is not a palindrome. The nearest palindrome date is ${nextDate.day}-${nextDate.month}-${nextDate.year} in this ${formatOfNextDate} format, you missed by ${nextCounter} days 😏`
+        }
+        
     } else{
         errorMessage.innerText = ""
-        output.innerText = "Yay! Your birthday is palindrome ❤️🥳"
+        output.innerText = `Yay! Your birthday in ${resultList.dateFormat} format, is a palindrome ❤️🥳`
     }
 
 }
