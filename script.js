@@ -225,11 +225,16 @@ const output = document.querySelector("#output")
 const errorMessage = document.querySelector("#error-message")
 
 function checkClickHandler(){
+    errorMessage.innerText = ""
+    output.innerText = ""
+
+    //input
     var birthday = birthDayInput.value
     if(birthday === ""){
        return errorMessage.innerText = "Please select your birth date."
     }
 
+    //processing
     var date = birthday.split("-")
     var yyyy = date[0]
     var mm = date[1]
@@ -247,7 +252,8 @@ function checkClickHandler(){
     if(!resultList.foundPalindrome){
         const [nextCounter, nextDate, formatOfNextDate] = getNextPalindromeDate(date)
         const [previousCounter, previousDate, formatOfPreviousDate] = getPreviousPalindromeDate(date)
-        errorMessage.innerText = ""
+        
+        // output
         if(nextCounter > previousCounter){
             output.innerText = `Oops! Your Birthday is not a palindrome. The nearest palindrome date is ${previousDate.day}-${previousDate.month}-${previousDate.year} in this ${formatOfPreviousDate} format, you missed by ${previousCounter} days 😏`
         } else{
@@ -255,7 +261,6 @@ function checkClickHandler(){
         }
         
     } else{
-        errorMessage.innerText = ""
         output.innerText = `Yay! Your birthday in ${resultList.dateFormat} format, is a palindrome ❤️🥳`
     }
 
